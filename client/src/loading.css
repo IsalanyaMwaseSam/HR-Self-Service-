@@ -1,0 +1,31 @@
+/* LoadingSpinner.css */
+
+.loading-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 150px; /* Adjust size as needed */
+    height: 150px; /* Adjust size as needed */
+  }
+  
+  .loading-text {
+    position: absolute;
+    z-index: 1;
+    font-size: 16px; /* Adjust font size as needed */
+    color: white; /* Text color */
+  }
+  
+  .loading-spinner {
+    width: 50px; /* Adjust spinner size */
+    height: 50px; /* Adjust spinner size */
+    position: absolute;
+    animation: spin 2s linear infinite;
+  }
+  
+  /* Keyframes for spinning effect */
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  

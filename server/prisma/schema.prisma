@@ -1,0 +1,217 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+enum ReadingAbility {
+  None
+  Basic
+  Intermediate
+  Fluent
+}
+
+enum WritingAbility {
+  None
+  Basic
+  Intermediate
+  Fluent
+}
+
+enum SpeakingAbility {
+  None
+  Basic
+  Intermediate
+  Fluent
+}
+
+enum Gender {
+  Male
+  Female
+  Other
+}
+
+enum ApplicationStatus {
+  Applied
+  Longlisted
+  ShortListed
+  Interviewing
+  BackgroundChecks
+  VerifyingDocuments
+  Onboarding
+  Unsuccessful
+}
+
+
+model Applicant {
+  id       Int     @id @default(autoincrement())
+  email    String  @unique
+  password String
+  verificationToken String?
+  verified          Boolean  @default(false)
+  tokenExpiry        DateTime?
+  loginAttempts      Int      @default(0)
+  otp                String?
+  newOTP             String?
+  otpExpiry          DateTime?
+  loginOTP           String?
+  loginOTPExpiry     DateTime?
+  deviceToken      String?
+  lastOtpValidation DateTime? 
+  sessionToken    String?
+  activeSessionToken String?
+  personal          Personal?
+  experience        Experience[] 
+  skills            Skill[]
+  languages         Language[]
+  attachments       Attachment[]
+  education         Education[]
+  applications        Application[]  
+}
+
+
+model SMTP_Setup {
+  id             Int    @id @default(autoincrement())
+  smtpServer     String
+  smtpServerPort Int
+  username       String
+  password       String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Personal {
+  id                    Int       @id @default(autoincrement())
+  applicantID           Int       @unique
+  firstName             String
+  middleName            String
+  lastName              String
+  dob                   DateTime
+  nationality           String
+  gender                Gender
+  street                String
+  houseNumber           String
+  town                  String
+  city                  String
+  postalCode            String
+  country               String
+  phoneNumber           String
+  alternativePhoneNumber String?
+  alternativeEmail      String?
+  availability          Int
+  applicant             Applicant @relation(fields: [applicantID], references: [id])
+}
+
+model Education {
+  id                Int       @id @default(autoincrement())
+  applicantID       Int       @unique
+  institution       String
+  degree            String
+  country           String
+  title             String
+  startDate         DateTime
+  endDate           DateTime
+  level             String
+  subject           String
+  certificateName   String
+  issuingInstitution  String
+  registrationNumber String
+  yearOfIssue       Int
+
+  applicant         Applicant @relation(fields: [applicantID], references: [id])
+}
+
+model Experience {
+  id                Int       @id @default(autoincrement())
+  applicantID       Int       @unique
+  employerName       String
+  workArea          String
+  country           String
+  functionalTitle   String
+  startDate         DateTime
+  endDate           DateTime
+  noOfEmployeesSupervised String
+  descriptionOfDuties       String
+  majorAchievements String
+  leavingReasons    String
+
+  applicant         Applicant @relation(fields: [applicantID], references: [id])
+}
+
+model Skill {
+  id                Int       @id @default(autoincrement())
+  applicantID       Int       
+  skillDescription  String
+  yearsOfExperience      Int
+
+  applicant         Applicant @relation(fields: [applicantID], references: [id])
+  @@unique([applicantID, skillDescription])
+}
+
+model Language {
+  id                Int       @id @default(autoincrement())
+  applicantID       Int       @unique
+  languageName      String
+  readingAbility    ReadingAbility
+  writingAbility    WritingAbility
+  speakingAbility   SpeakingAbility
+
+  
+  applicant         Applicant @relation(fields: [applicantID], references: [id])
+}
+
+model Attachment {
+  id                Int       @id @default(autoincrement())
+  applicantID       Int       @unique
+  fileType          String
+  fileName          String
+  fileSize          Int
+  lastUpdated       DateTime
+
+ 
+  applicant         Applicant @relation(fields: [applicantID], references: [id])
+}
+
+model Application {
+  id                Int       @id @default(autoincrement())
+  vacancyCode       String
+  selectedValue     String
+  coverLetterFiles  File[]    @relation("CoverLetterFiles")
+  resumeFiles       File[]    @relation("ResumeFiles")
+  otherFiles        File[]    @relation("OtherFiles")
+  applicant         Applicant @relation(fields: [applicantID], references: [id])
+  applicantID       Int
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  applicationStatus  ApplicationStatus @default(Applied)
+}
+
+
+model File {
+  id                Int       @id @default(autoincrement())
+  url               String
+  fileName          String
+  fileType          String
+  applicationID     Int?
+  coverLetterApp    Application? @relation("CoverLetterFiles", fields: [applicationID], references: [id], map: "cover_letter_file_fkey")
+  resumeApp         Application? @relation("ResumeFiles", fields: [applicationID], references: [id], map: "resume_file_fkey")
+  otherApp          Application? @relation("OtherFiles", fields: [applicationID], references: [id], map: "other_file_fkey")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+
+
+
+
+
+
+
+
+
+
+
