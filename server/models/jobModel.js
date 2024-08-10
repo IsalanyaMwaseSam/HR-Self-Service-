@@ -11,10 +11,13 @@ const urls = {
 
 const fetchApiData = async (url, authHeaders) => {
   const response = await fetch(url, { headers: authHeaders });
-  const data = await response.json();
+  const text = await response.text(); // Get the raw text
+  console.log(`Raw response from ${url}:`, text); // Log the raw response
+  const data = JSON.parse(text); // Manually parse the JSON
   console.log(`Data from ${url}:`, data);
-  return data.value; 
+  return data.value;
 };
+
 
 
 const getJobDetails = async (vacancyCode, authHeaders) => {

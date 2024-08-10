@@ -23,6 +23,7 @@ const userdataRoutes = require('./routes/userdataRoute')
 const smtpRoutes = require('./routes/smtpRoute')
 const googleRoute = require('./routes/googleRoute')
 const applicationRoutes = require('./routes/applicationRoute')
+const myApplicationRoutes = require('./routes/myApplicationRoute')
 const app = express();
 const path = require('path'); 
 
@@ -66,6 +67,8 @@ app.use('/api',  bodyParser.json(), googleRoute)
 app.use('/api',  bodyParser.json(), jobRoutes);
 
 app.use('/api', applicationRoutes);
+
+app.use('/api', myApplicationRoutes);
 
 // Configure session
 app.use(session({ secret: 'secret', resave: false, saveUninitialized: true }));

@@ -13,6 +13,9 @@ CREATE TYPE "Gender" AS ENUM ('Male', 'Female', 'Other');
 -- CreateEnum
 CREATE TYPE "ApplicationStatus" AS ENUM ('Applied', 'Longlisted', 'ShortListed', 'Interviewing', 'BackgroundChecks', 'VerifyingDocuments', 'Onboarding', 'Unsuccessful');
 
+-- CreateEnum
+CREATE TYPE "VacancyStatus" AS ENUM ('Posted', 'Cancelled', 'Archived');
+
 -- CreateTable
 CREATE TABLE "Applicant" (
     "id" SERIAL NOT NULL,
@@ -148,7 +151,17 @@ CREATE TABLE "Attachment" (
 CREATE TABLE "Application" (
     "id" SERIAL NOT NULL,
     "vacancyCode" TEXT NOT NULL,
+    "department" TEXT NOT NULL,
+    "vacancyDeadline" TIMESTAMP(3) NOT NULL,
+    "vacancyStatus" "VacancyStatus" NOT NULL DEFAULT 'Posted',
     "selectedValue" TEXT NOT NULL,
+    "applicantFirstName" TEXT NOT NULL,
+    "applicantMiddleName" TEXT,
+    "applicantLastName" TEXT NOT NULL,
+    "applicantLocation" TEXT NOT NULL,
+    "applicantAvailability" INTEGER NOT NULL,
+    "applicantGender" TEXT NOT NULL,
+    "applicantAlternativeEmail" TEXT,
     "applicantID" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,

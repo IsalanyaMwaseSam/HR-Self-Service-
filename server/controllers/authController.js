@@ -14,6 +14,7 @@ exports.register = async (req, res) => {
   if (!isValidEmail(email)) {
     return res.status(400).json({ error: 'Invalid email format' });
   }
+  
 
   try {
     const existingApplicant = await Applicant.findByEmail(email);
@@ -54,6 +55,7 @@ exports.verifyToken = async (req, res) => {
     if (!applicant) {
       return res.status(404).json({ message: 'Invalid verification token', error });
     }
+
 
     console.log('applicant:', applicant)
 

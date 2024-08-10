@@ -46,6 +46,12 @@ enum ApplicationStatus {
   Unsuccessful
 }
 
+enum VacancyStatus {
+  Posted
+  Cancelled
+  Archived
+}
+
 
 model Applicant {
   id       Int     @id @default(autoincrement())
@@ -179,7 +185,17 @@ model Attachment {
 model Application {
   id                Int       @id @default(autoincrement())
   vacancyCode       String
+  department        String
+  vacancyDeadline   DateTime
+  vacancyStatus     VacancyStatus @default(Posted)
   selectedValue     String
+  applicantFirstName     String
+  applicantMiddleName    String?
+  applicantLastName      String
+  applicantLocation      String
+  applicantAvailability  Int
+  applicantGender        String
+  applicantAlternativeEmail String?
   coverLetterFiles  File[]    @relation("CoverLetterFiles")
   resumeFiles       File[]    @relation("ResumeFiles")
   otherFiles        File[]    @relation("OtherFiles")

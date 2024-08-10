@@ -19,6 +19,7 @@ module.exports = (req, res, next) => {
 
     console.log('Decoded Token:', decoded); // Log the decoded token for debugging
     req.user = decoded;
+    console.log('Middleware User:', req.user); // Check if this is set correctly
     next();
   });
 };
