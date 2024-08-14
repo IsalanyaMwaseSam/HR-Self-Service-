@@ -5,11 +5,15 @@ async function upsertSkill(applicantID, skillData) {
   try {
     const { skillDescription, yearsOfExperience } = skillData;
 
-    // Upsert the skill information
+    // Upsert the skill information based on applicantID and skillDescription
     return await prisma.skill.upsert({
-      where: { applicantID: applicantID },
+      where: {
+        applicantID_skillDescription: {
+          applicantID,
+          skillDescription,
+        }
+      },
       update: {
-        skillDescription,
         yearsOfExperience,
       },
       create: {
@@ -35,7 +39,26 @@ async function getSkillsByApplicantID(applicantID) {
   }
 }
 
+// Function to delete a skill record
+async function deleteSkill(applicantID, skillDescription) {
+  try {
+    return await prisma.skill.delete({
+      where: {
+        applicantID_skillDescription: {  
+          applicantID,
+          skillDescription,
+        }
+      }
+    });
+  } catch (error) {
+    console.error(`Error deleting skill: ${error.message}`);
+    throw new Error(`Error deleting skill: ${error.message}`);
+  }
+}
+
+
 module.exports = {
   upsertSkill,
-  getSkillsByApplicantID
+  getSkillsByApplicantID,
+  deleteSkill 
 };

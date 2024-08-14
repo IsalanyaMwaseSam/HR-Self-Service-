@@ -1,24 +1,24 @@
-const prisma = require('../prismaClient'); 
+const prisma = require('../prismaClient');
 
-// Function to upsert an attachment record
+
 async function upsertAttachment(applicantID, attachmentData) {
   try {
-    const { fileType, fileName, fileSize, lastUpdated } = attachmentData;
+    const lastUpdatedISO = new Date(attachmentData.lastUpdated).toISOString();
 
     return await prisma.attachment.upsert({
       where: { applicantID: applicantID },
       update: {
-        fileType,
-        fileName,
-        fileSize,
-        lastUpdated,
+        fileType: attachmentData.fileType,
+        fileName: attachmentData.fileName,
+        fileSize: parseInt(attachmentData.fileSize, 10),
+        lastUpdated: lastUpdatedISO,
       },
       create: {
         applicantID,
-        fileType,
-        fileName,
-        fileSize,
-        lastUpdated,
+        fileType: attachmentData.fileType,
+        fileName: attachmentData.fileName,
+        fileSize: parseInt(attachmentData.fileSize, 10),
+        lastUpdated: lastUpdatedISO,
       }
     });
   } catch (error) {

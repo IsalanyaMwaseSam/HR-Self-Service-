@@ -20,6 +20,7 @@ const createApplication = async (data) => {
           url: file.url,
           fileName: file.fileName,
           fileType: file.fileType,
+          category: 'COVER_LETTER',
         })),
       },
       resumeFiles: {
@@ -27,6 +28,7 @@ const createApplication = async (data) => {
           url: file.url,
           fileName: file.fileName,
           fileType: file.fileType,
+          category: 'RESUME',
         })),
       },
       otherFiles: {
@@ -34,6 +36,7 @@ const createApplication = async (data) => {
           url: file.url,
           fileName: file.fileName,
           fileType: file.fileType,
+          category: 'OTHER',
         })),
       },
       applicant: {

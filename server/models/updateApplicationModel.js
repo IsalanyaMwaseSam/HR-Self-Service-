@@ -3,7 +3,7 @@ const prisma = require('../prismaClient');
 async function updateApplication(id, data) {
   try {
     return await prisma.application.update({
-      where: { id },
+      where: { id: parseInt(id, 10) },
       data: {
         vacancyCode: data.vacancyCode,
         department: data.department,
@@ -22,6 +22,7 @@ async function updateApplication(id, data) {
             url: file.url,
             fileName: file.fileName,
             fileType: file.fileType,
+            category: 'COVER_LETTER',
           })),
         },
         resumeFiles: {
@@ -30,6 +31,7 @@ async function updateApplication(id, data) {
             url: file.url,
             fileName: file.fileName,
             fileType: file.fileType,
+            category: 'RESUME',
           })),
         },
         otherFiles: {
@@ -38,10 +40,12 @@ async function updateApplication(id, data) {
             url: file.url,
             fileName: file.fileName,
             fileType: file.fileType,
+            category: 'OTHER',
           })),
         },
       },
     });
+
   } catch (error) {
     throw new Error(`Error updating application: ${error.message}`);
   }

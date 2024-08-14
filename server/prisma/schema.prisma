@@ -52,6 +52,11 @@ enum VacancyStatus {
   Archived
 }
 
+enum FileCategory {
+  COVER_LETTER
+  RESUME
+  OTHER
+}
 
 model Applicant {
   id       Int     @id @default(autoincrement())
@@ -70,6 +75,7 @@ model Applicant {
   lastOtpValidation DateTime? 
   sessionToken    String?
   activeSessionToken String?
+  certificate      Certificate[]
   personal          Personal?
   experience        Experience[] 
   skills            Skill[]
@@ -114,7 +120,7 @@ model Personal {
 
 model Education {
   id                Int       @id @default(autoincrement())
-  applicantID       Int       @unique
+  applicantID       Int       
   institution       String
   degree            String
   country           String
@@ -123,17 +129,29 @@ model Education {
   endDate           DateTime
   level             String
   subject           String
-  certificateName   String
-  issuingInstitution  String
-  registrationNumber String
-  yearOfIssue       Int
 
   applicant         Applicant @relation(fields: [applicantID], references: [id])
+  
+  @@unique([applicantID, title]) // Unique constraint for education
 }
+
+model Certificate {
+  id                 Int    @id @default(autoincrement())
+  applicantID        Int
+  certificateName    String
+  issuingInstitution String
+  registrationNumber String
+  yearOfIssue        Int
+
+  applicant          Applicant @relation(fields: [applicantID], references: [id])
+
+  @@unique([applicantID, certificateName]) // Unique constraint for certificates
+}
+
 
 model Experience {
   id                Int       @id @default(autoincrement())
-  applicantID       Int       @unique
+  applicantID       Int       
   employerName       String
   workArea          String
   country           String
@@ -146,6 +164,7 @@ model Experience {
   leavingReasons    String
 
   applicant         Applicant @relation(fields: [applicantID], references: [id])
+  @@unique([applicantID, employerName, startDate]) 
 }
 
 model Skill {
@@ -159,16 +178,17 @@ model Skill {
 }
 
 model Language {
-  id                Int       @id @default(autoincrement())
-  applicantID       Int       @unique
-  languageName      String
-  readingAbility    ReadingAbility
-  writingAbility    WritingAbility
-  speakingAbility   SpeakingAbility
+  id              Int             @id @default(autoincrement())
+  applicantID     Int
+  languageName    String
+  readingAbility  ReadingAbility
+  writingAbility  WritingAbility
+  speakingAbility SpeakingAbility
+  applicant       Applicant       @relation(fields: [applicantID], references: [id])
 
-  
-  applicant         Applicant @relation(fields: [applicantID], references: [id])
+  @@unique([applicantID, languageName])
 }
+
 
 model Attachment {
   id                Int       @id @default(autoincrement())
@@ -213,6 +233,7 @@ model File {
   fileName          String
   fileType          String
   applicationID     Int?
+  category       FileCategory
   coverLetterApp    Application? @relation("CoverLetterFiles", fields: [applicationID], references: [id], map: "cover_letter_file_fkey")
   resumeApp         Application? @relation("ResumeFiles", fields: [applicationID], references: [id], map: "resume_file_fkey")
   otherApp          Application? @relation("OtherFiles", fields: [applicationID], references: [id], map: "other_file_fkey")

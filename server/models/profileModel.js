@@ -9,6 +9,7 @@ async function getProfileById(applicantID) {
         education: true,
         skills: true,
         experience: true,
+        certificate: true,
         languages: true,
         attachments: true,
         personal: true,

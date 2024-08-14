@@ -3,8 +3,8 @@ const { createApplicationHandler, getApplicationsHandler } = require('../control
 const { getApplicationById } = require('../controllers/viewApplicationsController');
 const {updateApplicationHandler} = require('../controllers/updateApplicationController')
 const { deleteApplicationHandler } =  require('../controllers/deleteApplicationController')
-const router = express.Router();
 const verifyToken = require('../middlweware/verifyToken')
+const router = express.Router();
 
 
 router.post('/my-applications', verifyToken, createApplicationHandler);

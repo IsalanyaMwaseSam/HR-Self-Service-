@@ -13,8 +13,10 @@ module.exports = (req, res, next) => {
 
   jwt.verify(token, jwtSecretKey, (err, decoded) => {
     if (err) {
-      console.error('Token verification error:', err); // Log the error for debugging
-      return res.status(403).json({ error: 'Invalid or expired token' });
+      if (err.name === 'TokenExpiredError') {
+        return res.status(401).json({ message: 'Your session has expired. Please log back in.' });
+      }
+      return res.status(500).send('Failed to authenticate token.');
     }
 
     console.log('Decoded Token:', decoded); // Log the decoded token for debugging

@@ -6,6 +6,7 @@ const handleFileUpload = async (files) => {
   if (!files) return [];
   const filePromises = files.map(file => uploadFile(file));
   const fileData = await Promise.all(filePromises);
+  console.log('Uploaded File Data:', fileData);
   return fileData;
 };
 
@@ -14,10 +15,13 @@ const submitApplication = async (req, res) => {
     const { vacancyCode, selectedValue, department, vacancyDeadline, vacancyStatus, firstName, middleName, lastName, location, availability, gender, alternativeEmail } = req.body;
     const { coverLetterFiles, resumeFiles, otherFiles } = req.files;
 
-    const coverLetterData = await handleFileUpload(coverLetterFiles || []);
-    const resumeData = await handleFileUpload(resumeFiles || []);
-    const otherData = await handleFileUpload(otherFiles || []);
+    const coverLetterData = coverLetterFiles ? await handleFileUpload(coverLetterFiles) : [];
+    const resumeData = resumeFiles ? await handleFileUpload(resumeFiles) : [];
+    const otherData = otherFiles ? await handleFileUpload(otherFiles) : [];
 
+    console.log('Cover Letter Data:', coverLetterData);
+    console.log('Resume Data:', resumeData);
+    console.log('Other Data:', otherData);
 
     const applicationData = {
       vacancyCode,

@@ -5,5 +5,7 @@ const verifyToken = require('../middlweware/verifyToken'); // Middleware for ver
 
 router.post('/experience', verifyToken, experienceController.updateExperienceInfo);
 router.get('/experience', verifyToken, experienceController.getExperienceInfo);
+router.delete('/experience', verifyToken, experienceController.deleteExperience)
 
 module.exports = router;
+
