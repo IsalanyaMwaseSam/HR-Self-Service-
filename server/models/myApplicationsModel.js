@@ -63,7 +63,12 @@ async function fetchApplicationsByEmail(userEmail) {
       },
     });
 
-    return applications;
+    const currentDate = new Date();
+
+    return applications.map(app => ({
+      ...app,
+      canEditOrWithdraw: app.applicationStatus !== 'Longlisted' && new Date(app.vacancyDeadline) > currentDate,
+    }));
   } catch (error) {
     throw new Error(`Error fetching applications for ${userEmail}: ${error.message}`);
   }

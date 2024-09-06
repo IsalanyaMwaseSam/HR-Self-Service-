@@ -1,20 +1,29 @@
 const prisma = require('../prismaClient');
 
 const createApplication = async (data) => {
+  // Find the corresponding PostedJob by vacancyCode
+  const postedJob = await prisma.postedJob.findUnique({
+    where: { vacancyCode: data.vacancyCode },
+  });
+
+  if (!postedJob) {
+    throw new Error(`No PostedJob found with vacancyCode: ${data.vacancyCode}`);
+  }
+
   return await prisma.application.create({
     data: {
       vacancyCode: data.vacancyCode,
       department: data.department,
-      vacancyDeadline: new Date(data.vacancyDeadline), 
+      vacancyDeadline: new Date(data.vacancyDeadline),
       vacancyStatus: data.vacancyStatus,
       selectedValue: data.selectedValue,
       applicantFirstName: data.applicantFirstName,
-      applicantMiddleName: data.applicantMiddleName, 
+      applicantMiddleName: data.applicantMiddleName,
       applicantLastName: data.applicantLastName,
       applicantLocation: data.applicantLocation,
-      applicantAvailability: parseInt(data.applicantAvailability, 10), 
+      applicantAvailability: parseInt(data.applicantAvailability, 10),
       applicantGender: data.applicantGender,
-      applicantAlternativeEmail: data.applicantAlternativeEmail, 
+      applicantAlternativeEmail: data.applicantAlternativeEmail,
       coverLetterFiles: {
         create: data.coverLetterFiles.map(file => ({
           url: file.url,
@@ -42,7 +51,11 @@ const createApplication = async (data) => {
       applicant: {
         connect: { id: data.applicantID },
       },
-      applicationStatus: 'Applied', 
+      applicationScore: data.applicationScore,
+      applicationStatus: 'Applied',
+      postedJob: {
+        connect: { id: postedJob.id },
+      },
     },
   });
 };

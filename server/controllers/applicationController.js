@@ -1,6 +1,7 @@
 const { createApplication } = require('../models/applicationModel');
 const { uploadFile } = require('../utils/utils');
 const { getJobDetails } = require('../models/jobModel');
+const { getApplicantData, calculateScore } = require('../models/scoreSystemModel');
 
 const handleFileUpload = async (files) => {
   if (!files) return [];
@@ -19,9 +20,19 @@ const submitApplication = async (req, res) => {
     const resumeData = resumeFiles ? await handleFileUpload(resumeFiles) : [];
     const otherData = otherFiles ? await handleFileUpload(otherFiles) : [];
 
-    console.log('Cover Letter Data:', coverLetterData);
-    console.log('Resume Data:', resumeData);
-    console.log('Other Data:', otherData);
+    const applicantId = req.user.id;
+    const jobRoleId = vacancyCode; // Assuming jobRoleId is equivalent to vacancyCode
+
+    console.log("The job role id is:", jobRoleId);
+
+    const applicantData = await getApplicantData(applicantId);
+    if (!applicantData) {
+      return res.status(404).json({ error: 'Applicant not found' });
+    }
+
+    const scoreBreakdown = await calculateScore(applicantData, jobRoleId);
+
+    console.log("Application Score Breakdown for applicant:", applicantId, scoreBreakdown);
 
     const applicationData = {
       vacancyCode,
@@ -33,25 +44,25 @@ const submitApplication = async (req, res) => {
       applicantMiddleName: middleName,
       applicantLastName: lastName,
       applicantLocation: location,
-      applicantAvailability: availability, 
+      applicantAvailability: availability,
       applicantGender: gender,
       applicantAlternativeEmail: alternativeEmail,
       coverLetterFiles: coverLetterData,
       resumeFiles: resumeData,
       otherFiles: otherData,
-      applicantID: req.user.id,
+      applicantID: applicantId,
+      applicationScore: scoreBreakdown.total, // Store the calculated total score
+      scoreBreakdown, // Optionally store the breakdown if you want to persist it
     };
 
     await createApplication(applicationData);
     res.status(201).json({ message: 'Application submitted successfully' });
-    console.log('Request Body:', req.body);
-    console.log('Request Files:', req.files);
-    console.log('Vacancy Deadline:', vacancyDeadline);
-    console.log('Vacancy Status:', vacancyStatus);
+
   } catch (error) {
     console.error('Error submitting application:', error);
     res.status(500).json({ error: 'Failed to submit application' });
   }
 };
+
 
 module.exports = { submitApplication };

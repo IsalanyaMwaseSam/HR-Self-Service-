@@ -4,7 +4,7 @@ const applicantModel = require('../models/userdataModel');
 exports.getUserData = async (req, res) => {
   try {
     const email = req.user.email; 
-
+    console.log('The email is:', email)
     if (!email) {
       throw new Error('Email is undefined');
     }

@@ -2,6 +2,12 @@ const prisma = require('../prismaClient');
 
 async function updateApplication(id, data) {
   try {
+    console.log('updateApplication function called');
+    console.log('Cover Letter Files:', data.coverLetterFiles);
+    console.log('Resume Files:', data.resumeFiles);
+    console.log('Other Files:', data.otherFiles);
+    console.log('data:', data)
+
     return await prisma.application.update({
       where: { id: parseInt(id, 10) },
       data: {
@@ -41,14 +47,17 @@ async function updateApplication(id, data) {
             fileName: file.fileName,
             fileType: file.fileType,
             category: 'OTHER',
-          })),
+            
+          }) ),
         },
       },
+      
     });
 
   } catch (error) {
     throw new Error(`Error updating application: ${error.message}`);
   }
 }
+
 
 module.exports = { updateApplication };

@@ -16,6 +16,7 @@ module.exports = (req, res, next) => {
       if (err.name === 'TokenExpiredError') {
         return res.status(401).json({ message: 'Your session has expired. Please log back in.' });
       }
+      console.error('Failed to authenticate token:', err.message);
       return res.status(500).send('Failed to authenticate token.');
     }
 

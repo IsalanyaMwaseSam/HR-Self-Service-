@@ -25,11 +25,47 @@ const googleRoute = require('./routes/googleRoute')
 const applicationRoutes = require('./routes/applicationRoute')
 const myApplicationRoutes = require('./routes/myApplicationRoute')
 const updateApplicationRoutes = require('./routes/updateApplicationRoute')
+const staffRoutes = require('./routes/staffRoute')
+const staffPasswordSetRoutes = require('./routes/staffPasswordSetRoute')
+const staffLoginRoutes = require('./routes/staffLoginRoute')
+const saveEvaluationCriteriaRoutes = require('./routes/saveEvaluationCriteriaRoute')
+const savePostedJobRoutes = require('./routes/postJobRoute')
+const staffApplicationRoutes = require('./routes/StaffApplicationsRoute')
+const longlistRoutes = require('./routes/longlistRoute')
+const pendingLonglistCountRoutes = require('./routes/pendingLonglistingRoute')
+const pendingShortlistCountRoutes = require('./routes/pendingShortlistCountRoute')
+
 const app = express();
 const path = require('path'); 
 
 
 app.use(cors());
+
+// Configure session
+app.use(session({ secret: 'secret', resave: false, saveUninitialized: true }));
+
+// Initialize passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use(express.json());
+
+
+
+app.get('/success', (req, res) => res.send(userProfile));
+
+// Serialize user
+passport.serializeUser((user, done) => {
+  done(null, user);
+});
+
+passport.deserializeUser((obj, done) => {
+  done(null, obj);
+});
+
+
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api',  bodyParser.json(), logoRoutes)
 
@@ -73,104 +109,24 @@ app.use('/api', myApplicationRoutes);
 
 app.use('/api', updateApplicationRoutes);
 
-// Configure session
-app.use(session({ secret: 'secret', resave: false, saveUninitialized: true }));
+app.use('/api', staffRoutes);
 
-// Initialize passport
-app.use(passport.initialize());
-app.use(passport.session());
+app.use('/api', staffPasswordSetRoutes)
 
+app.use('/api', staffLoginRoutes)
 
-app.get('/success', (req, res) => res.send(userProfile));
+app.use('/api', saveEvaluationCriteriaRoutes)
 
-// Serialize user
-passport.serializeUser((user, done) => {
-  done(null, user);
-});
+app.use('/api', savePostedJobRoutes)
 
-passport.deserializeUser((obj, done) => {
-  done(null, obj);
-});
+app.use('/api', staffApplicationRoutes)
 
+app.use('/api', longlistRoutes)
 
-// passport.use(new FacebookStrategy({
-//   clientID: process.env.FACEBOOK_APP_ID,
-//   clientSecret: process.env.FACEBOOK_APP_SECRET,
-//   callbackURL: `${backendUrl}/auth/facebook/callback`
-// }, (token, tokenSecret, profile, done) => {
-//   return done(null, profile);
-// }));
+app.use('/api', pendingLonglistCountRoutes)
 
-// // Route to initiate Facebook OAuth
-// app.get('/auth/facebook',
-//   passport.authenticate('facebook')
-// );
+app.use('/api', pendingShortlistCountRoutes)
 
-// // Route to handle Facebook OAuth callback
-// app.get('/auth/facebook/callback',
-//   passport.authenticate('facebook', { failureRedirect: '/login' }),
-//   (req, res) => {
-//     // Successful authentication, redirect to frontend dashboard
-//     res.redirect(`${frontendUrl}`);
-//   }
-// );
-
-
-// // Configure Twitter authentication strategy
-// passport.use(new Strategy({
-//   authorizationURL: "https://twitter.com/i/oauth2/authorize?code_challenge=challenge&code_challenge_method=plain",
-//   clientID: process.env.X_CLIENT_ID,
-//   clientSecret: process.env.X_CLIENT_SECRET,
-//   callbackURL: 'http://192.168.83.23:5000/auth/twitter/callback',
-//   state: "state",
-//   code_challenge: "challenge",
-//   code_challenge_method: "plain",
-//   scope: ['tweet.read'] 
-// }, (accessToken, refreshToken, profile, done) => {
-//   console.log('Twitter OAuth Callback - Access Token:', accessToken);
-//   console.log('Twitter OAuth Callback - Refresh Token:', refreshToken);
-//   console.log('Twitter OAuth Callback - Profile:', profile);
-  
-
-//   return done(null, profile);
-// }));
-
-// app.get('/auth/twitter',
-//   passport.authenticate('twitter', {
-//     scope: ['tweet.read'] 
-//   })
-// );
-
-// app.get('/auth/twitter/callback', (req, res, next) => {
-//   passport.authenticate('twitter', (err, user, info) => {
-//     console.log('OAuth Callback Request Query:', req.query);
-//     console.log('OAuth Callback Request User:', user);
-//     console.log('OAuth Callback Request Auth Info:', info);
-
-//     if (err) {
-//       console.error('Authentication error:', err);
-//       return res.redirect('http://localhost:3000/login');
-//     }
-
-//     if (!user) {
-//       console.error('User not authenticated:', info);
-//       return res.redirect('http://localhost:3000/login');
-//     }
-
-//     req.logIn(user, (err) => {
-//       if (err) {
-//         console.error('Login error:', err);
-//         return res.redirect('http://localhost:3000/login');
-//       }
-
-//       console.log('Authentication successful:', user);
-//       return res.redirect('http://localhost:3000');
-//     });
-//   })(req, res, next);
-// });
-
-
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 // Serve static files from the React app

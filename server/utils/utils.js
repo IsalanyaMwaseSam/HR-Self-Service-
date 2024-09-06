@@ -3,18 +3,19 @@ const { jwtSecretKey } = process.env;
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY); 
 const multer = require('multer');
-const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 const fs = require('fs');
+const prisma = require('../prismaClient');
+const crypto = require('crypto');
+
 
 // Configure multer to use memory storage
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-// File upload logic
 const uploadFile = async (file) => {
-  // Generate a unique filename with the same extension as the original file
-  const filename = `${uuidv4()}${path.extname(file.originalname)}`;
+  // Use the original filename directly
+  const filename = file.originalname;
   
   // Define the path to save the file
   const uploadPath = path.join(__dirname, '..', 'uploads', filename);
@@ -29,19 +30,12 @@ const uploadFile = async (file) => {
 
   // Return metadata including the URL for access
   return {
-    url: `/uploads/${filename}`,      // The URL where the file can be accessed
-    fileName: file.originalname,      // Original filename
-    fileType: file.mimetype,          // MIME type of the file
+    url: `/uploads/${filename}`,  // The URL where the file can be accessed
+    fileName: file.originalname,  // Original filename
+    fileType: file.mimetype,      // MIME type of the file
+    fileSize: file.size
   };
 };
-
-// Export the upload middleware and uploadFile function
-module.exports = {
-  upload,
-  uploadFile,
-};
-
-
 
 async function sendLoginOTPByEmail(email, otp) {
   
@@ -90,6 +84,37 @@ const generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
+// Middleware or route after user login
+const checkPasswordChange = async (req, res, next) => {
+  if (!req.user || !req.user.email) {
+    return res.status(400).json({ error: 'User not authenticated' });
+  }
+  const { email } = req.user;
+  
+  console.log("The email is:", email)
+  const user = await prisma.applicant.findUnique({
+    where: { email },
+  });
+
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
+  if (user.mustChangePassword) {
+    // If the user must change their password, generate a new JWT
+    const sessionToken = crypto.randomBytes(20).toString('hex');
+    const jwtPayload = { email, sessionToken };
+    const jwtToken = generateJWT(jwtPayload, { expiresIn: '1h' });
+
+    // Redirect to password change page
+    return res.redirect(`/api/reset-password?token=${jwtToken}`);
+  }
+
+  // Continue to the next middleware if no password change is needed
+  next();
+};
+
+
 
 
 module.exports = {
@@ -97,5 +122,7 @@ module.exports = {
   generateOTP,
   isValidEmail,
   sendLoginOTPByEmail,
-  uploadFile
+  upload,
+  uploadFile,
+  checkPasswordChange
 };

@@ -1,10 +1,15 @@
 const prisma = require('../prismaClient'); 
 
 // Function to get profile data for an applicant
-async function getProfileById(applicantID) {
+async function getProfileById(applicantID, email) {
   try {
+    // If applicantID is provided, search by ID; otherwise, search by email
+    const whereClause = applicantID
+      ? { id: applicantID }
+      : { email: email };
+
     return await prisma.applicant.findUnique({
-      where: { id: applicantID },
+      where: whereClause,
       include: {
         education: true,
         skills: true,
@@ -12,14 +17,16 @@ async function getProfileById(applicantID) {
         certificate: true,
         languages: true,
         attachments: true,
-        personal: true,
+        personal: true
       }
     });
   } catch (error) {
-    throw new Error(`Error fetching profile data: ${error.message}`);
+    throw new Error("Error fetching profile data: " + error.message);
   }
 }
 
+
+
 module.exports = {
-  getProfileById
+  getProfileById,
 };

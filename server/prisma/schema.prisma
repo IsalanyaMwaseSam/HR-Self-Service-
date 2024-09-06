@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -75,6 +75,7 @@ model Applicant {
   lastOtpValidation DateTime? 
   sessionToken    String?
   activeSessionToken String?
+  mustChangePassword Boolean  @default(false) 
   certificate      Certificate[]
   personal          Personal?
   experience        Experience[] 
@@ -196,6 +197,7 @@ model Attachment {
   fileType          String
   fileName          String
   fileSize          Int
+  url          String?
   lastUpdated       DateTime
 
  
@@ -221,9 +223,12 @@ model Application {
   otherFiles        File[]    @relation("OtherFiles")
   applicant         Applicant @relation(fields: [applicantID], references: [id])
   applicantID       Int
+  applicationScore          Float  
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
   applicationStatus  ApplicationStatus @default(Applied)
+  postedJob                PostedJob           @relation(fields: [postedJobId], references: [id])
+  postedJobId       Int                 // Foreign key to PostedJob
 }
 
 
@@ -241,10 +246,88 @@ model File {
   updatedAt         DateTime  @updatedAt
 }
 
+model Staff {
+  id                Int       @id @default(autoincrement())
+  email             String    @unique
+  password          String
+  profileId         Int
+  profile           Profile   @relation(fields: [profileId], references: [id])
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  passwordUpdatedAt DateTime?
+  verified                  Boolean  @default(false)
+  verificationToken         String?
+  verificationTokenExpiry   DateTime?
+  sessionToken      String?
+  evaluations       EvaluationCriteria[] // Relation to EvaluationCriteria
+
+  @@map("staff")
+}
 
 
+model EvaluationCriteria {
+  id               String      @id @default(cuid())
+  jobRoleId        String
+  criteria         Criterion[]
+  createdAt        DateTime    @default(now())
+  createdBy        Staff       @relation(fields: [createdByEmail], references: [email])
+  createdByEmail   String      // Store the email of the creator
+  postedJob        PostedJob[]
+}
 
 
+model Profile {
+  id          Int          @id @default(autoincrement())
+  name        String        @unique
+  permissions Permission[]
+  users       Staff[]
+
+  @@map("profiles")
+}
+
+model Permission {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  profiles  Profile[]
+
+  @@map("permissions")
+}
+
+model Criterion {
+  id                  String              @id @default(cuid())
+  label               String
+  weight              Float
+  options             Option[]
+  evaluation          EvaluationCriteria   @relation(fields: [evaluationCriteriaId], references: [id])
+  evaluationCriteriaId String
+}
+
+model Option {
+  id          String     @id @default(cuid())
+  label       String
+  points      Float
+  criterion   Criterion  @relation(fields: [criterionId], references: [id])
+  criterionId String
+}
+
+model PostedJob {
+  id                Int                 @id @default(autoincrement())
+  vacancyCode       String              @unique
+  SystemId          String              // System ID from the original API
+  positionCode      String
+  jobTitle          String
+  orgDepartment     String
+  dutyStation       String
+  contractType      String
+  duration          String
+  applicationPeriod String
+  evaluationCriteria EvaluationCriteria? @relation(fields: [evaluationCriteriaId], references: [id])
+  applications        Application[]       // Relation to Application model
+  isPosted         Boolean  @default(false)
+  evaluationCriteriaId String?           
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+}
 
 
 

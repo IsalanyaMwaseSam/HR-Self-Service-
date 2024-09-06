@@ -11,14 +11,19 @@ async function upsertAttachment(applicantID, attachmentData) {
         fileType: attachmentData.fileType,
         fileName: attachmentData.fileName,
         fileSize: parseInt(attachmentData.fileSize, 10),
+        url: attachmentData.url,
         lastUpdated: lastUpdatedISO,
       },
       create: {
-        applicantID,
+        // applicantID,
         fileType: attachmentData.fileType,
         fileName: attachmentData.fileName,
         fileSize: parseInt(attachmentData.fileSize, 10),
+        url: attachmentData.url,
         lastUpdated: lastUpdatedISO,
+        applicant: {
+          connect: { id: applicantID }  // Explicitly connecting the relationship
+        }
       }
     });
   } catch (error) {
@@ -26,6 +31,17 @@ async function upsertAttachment(applicantID, attachmentData) {
   }
 }
 
+async function getAttachmentsByApplicantID(applicantID) {
+  try {
+    return await prisma.attachment.findMany({
+      where: { applicantID: applicantID },
+    });
+  } catch (error) {
+    throw new Error(`Error fetching attachments: ${error.message}`);
+  }
+}
+
 module.exports = {
-  upsertAttachment
+  upsertAttachment,
+  getAttachmentsByApplicantID
 };

@@ -48,15 +48,24 @@ exports.verifyOTP = async (req, res) => {
 exports.resetPassword = async (req, res) => {
   const { email, newPassword } = req.body;
 
+  if (!req.user || !req.user.email) {
+    return res.status(400).json({ error: 'User not authenticated or email missing' });
+  }
+
+  if (!newPassword) {
+    return res.status(400).json({ error: 'New password is required' });
+  }
+
   try {
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await prisma.applicant.update({
+      where: { email: req.user.email },
+      data: { email: email, password: newPassword, mustChangePassword: false },
+    });
 
-    await Applicant.updatePassword(email, hashedPassword);
-
-    res.status(200).json({ message: 'Password Successfully Changed' });
+    res.status(200).json({ message: 'Password updated successfully' });
   } catch (error) {
-    console.error('Error changing password:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Error updating password:', error);
+    res.status(500).json({ error: 'Failed to update password' });
   }
 };
 

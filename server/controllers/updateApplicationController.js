@@ -6,6 +6,7 @@ const updateApplicationHandler = async (req, res) => {
     const updatedApplication = await updateApplication(id, req.body);
     res.json(updatedApplication);
     console.log('the body:', updatedApplication)
+    console.log('Application update successful:', updatedApplication);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
