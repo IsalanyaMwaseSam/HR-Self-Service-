@@ -14,7 +14,7 @@ exports.getPostedJobsWithCriteria = async (req, res) => {
 exports.createPostedJob = async (req, res) => {
   try {
     console.log('Received request to create job with data:', req.body);
-    const jobData = req.body; // Ensure that this contains all required fields
+    const jobData = req.body;
 
     const savedJob = await JobModel.saveJobWithCriteria(jobData); // Save job and criteria to DB
 

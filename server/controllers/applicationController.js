@@ -21,7 +21,7 @@ const submitApplication = async (req, res) => {
     const otherData = otherFiles ? await handleFileUpload(otherFiles) : [];
 
     const applicantId = req.user.id;
-    const jobRoleId = vacancyCode; // Assuming jobRoleId is equivalent to vacancyCode
+    const jobRoleId = vacancyCode; 
 
     console.log("The job role id is:", jobRoleId);
 

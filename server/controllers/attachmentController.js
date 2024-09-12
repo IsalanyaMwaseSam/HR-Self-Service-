@@ -3,7 +3,7 @@ const {uploadFile} = require('../utils/utils')
 
 exports.addOrUpdateAttachment = async (req, res) => {
   try {
-    const { lastUpdated } = req.body; // Only destructuring lastUpdated from req.body
+    const { lastUpdated } = req.body; 
     const { file } = req; // Access the uploaded file
 
     // Save the file using the uploadFile function

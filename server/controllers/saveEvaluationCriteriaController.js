@@ -132,7 +132,7 @@ const getAllEvaluationCriteriaHandler = async (req, res) => {
 
     // Fetch the evaluation criteria for the given jobRoleId (vacancyCode)
     const evaluationCriteria = await prisma.evaluationCriteria.findFirst({
-      where: { jobRoleId: vacancyCode },  // Assuming jobRoleId is the vacancyCode
+      where: { jobRoleId: vacancyCode },  
       include: {
         criteria: {
           include: {
